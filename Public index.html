@@ -1,0 +1,59 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Love App ❤️</title>
+<style>
+body{margin:0; font-family:system-ui; background:linear-gradient(135deg,#ff9a9e,#fad0c4); min-height:100vh; display:flex; align-items:center; justify-content:center; text-align:center; color:#333}
+.card{background:rgba(255,255,255,0.9); padding:30px; border-radius:24px; box-shadow:0 20px 40px rgba(0,0,0,0.1); width:90%; max-width:380px}
+h1{font-size:28px; margin:10px 0}
+.hearts{font-size:64px; margin:20px 0; animation:beat 1s infinite alternate}
+@keyframes beat{to{transform:scale(1.2)}}
+button{background:#ff4d6d; color:white; border:none; padding:14px 28px; border-radius:50px; font-size:18px; cursor:pointer; margin:8px; box-shadow:0 4px 15px rgba(255,77,109,0.4)}
+input{padding:12px; border-radius:12px; border:1px solid #ddd; width:80%; margin:10px 0; font-size:16px}
+.counter{font-size:20px; margin:15px 0; color:#ff4d6d; font-weight:bold}
+</style>
+</head>
+<body>
+<div class="card">
+  <h1>قصتنا أنا و أنتِ ❤️</h1>
+  <div class="hearts" id="heartDisplay">❤️</div>
+  <div class="counter">القلوب: <span id="count">0</span></div>
+  <div id="msgDisplay" style="font-size:20px; margin:15px 0;">أحبك ❤️</div>
+  <div id="action" style="color:#888; font-size:14px;">بدأت قصتنا</div>
+  <br>
+  <button onclick="addHeart()">أرسل قلب ❤️</button>
+  <br>
+  <input id="msgInput" placeholder="اكتب رسالة لها...">
+  <button onclick="sendMsg()">أرسل رسالة 💌</button>
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+const socket = io();
+socket.on('update', (state)=>{
+  document.getElementById('count').innerText = state.hearts;
+  document.getElementById('msgDisplay').innerText = state.message;
+  document.getElementById('action').innerText = state.lastAction;
+  createHearts();
+});
+function addHeart(){ socket.emit('addHeart'); }
+function sendMsg(){
+  const input = document.getElementById('msgInput');
+  if(input.value){ socket.emit('sendMessage', input.value); input.value=''; }
+}
+function createHearts(){
+  for(let i=0;i<3;i++){
+    const h=document.createElement('div');
+    h.innerText='❤️'; h.style.position='fixed'; h.style.left=Math.random()*100+'%';
+    h.style.top='100%'; h.style.fontSize='24px'; h.style.animation='float 3s linear';
+    document.body.appendChild(h);
+    setTimeout(()=>h.remove(),3000);
+  }
+}
+</script>
+<style>@keyframes float{to{top:-10%; transform:translateX(100px)}}</style>
+</body>
+</html>
